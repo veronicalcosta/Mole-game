@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack a Mole</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f8ff;
+            flex-direction: column;
+        }
+
+        h1 {
+            color: #6a5acd;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(3, 150px);
+            grid-gap: 10px;
+        }
+
+        .hole {
+            width: 150px;
+            height: 150px;
+            background-color: #ffb6c1;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mole {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: top 0.3s ease;
+        }
+
+        .up {
+            top: 10px;
+        }
+
+        button {
+            background-color: #6a5acd;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #483d8b;
+        }
+
+        .scoreboard {
+            font-size: 1.5em;
+            margin-top: 20px;
+            color: #ff69b4;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Whack-a-Mole</h1>
+    <div class="game-container">
+        <div class="hole" id="hole1"><img src="Images/mole.png" alt="Mole" class="mole"></div>
+        <div class="hole" id="hole2"><img src="Images/mole.png" alt="Mole" class="mole"></div>
+        <div class="hole" id="hole3"><img src="Images/mole.png" alt="Mole" class="mole"></div>
+        <div class="hole" id="hole4"><img src="Images/mole.png" alt="Mole" class="mole"></div>
+        <div class="hole" id="hole5"><img src="Images/mole.png" alt="Mole" class="mole"></div>
+        <div class="hole" id="hole6"><img src="Images/mole.png" alt="Mole" class="mole"></div>
+    </div>
+    <button id="start">Start Game</button>
+    <div class="scoreboard">Score: <span id="score">0</span></div>
+
+    <script>
+        const holes = document.querySelectorAll('.hole');
+        const moles = document.querySelectorAll('.mole');
+        let lastHole;
+        let timeUp = false;
+        let score = 0;
+
+        // Function to randomly select a hole for the mole
+        function randomHole(holes) {
+            const idx = Math.floor(Math.random() * holes.length);
+            const hole = holes[idx];
+            if (hole === lastHole) {
+                return randomHole(holes);
+            }
+            lastHole = hole;
+            return hole;
+        }
+
+        // Function to make the mole pop up
+        function popUp() {
+            const time = Math.random() * 1000 + 500; // Random time between 500ms and 1500ms
+            const hole = randomHole(holes);
+            const mole = hole.querySelector('.mole');
+            mole.classList.add('up');
+            setTimeout(() => {
+                mole.classList.remove('up');
+                if (!timeUp) popUp();
+            }, time);
+        }
+
+        // Function to start the game
+        function startGame() {
+            document.getElementById('score').textContent = 0;
+            score = 0;
+            timeUp = false;
+            popUp();
+            setTimeout(() => timeUp = true, 15000); // Game runs for 15 seconds
+        }
+
+        // Function to whack the mole
+        function whackMole(e) {
+            if (!e.isTrusted) return; // Cheating check
+            score++;
+            this.classList.remove('up');
+            document.getElementById('score').textContent = score;
+        }
+
+        moles.forEach(mole => mole.addEventListener('click', whackMole));
+        document.getElementById('start').addEventListener('click', startGame);
+    </script>
+
+</body>
+</html>
